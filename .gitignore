@@ -3,3 +3,6 @@ data
 *.pyc
 *.pth
 *.csv
+*.xml
+*.iml
+.idea
