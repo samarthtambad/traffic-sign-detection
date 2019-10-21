@@ -44,7 +44,6 @@ val_loader = torch.utils.data.DataLoader(
 # We define neural net in model.py so that it can be reused by the evaluate.py script
 from model import Net
 model = Net()
-model.cuda()
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
@@ -52,7 +51,7 @@ optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 def train(epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = Variable(data.cuda()), Variable(target.cuda())
+        data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
@@ -70,7 +69,7 @@ def validation():
     correct = 0
     with torch.no_grad():
         for data, target in val_loader:
-            data, target = Variable(data.cuda()), Variable(target.cuda())
+            data, target = Variable(data), Variable(target)
             output = model(data)
             validation_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
             pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
