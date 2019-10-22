@@ -45,7 +45,7 @@ with torch.no_grad():
         if 'ppm' in f:
             data = data_transforms(pil_loader(test_dir + '/' + f))
             data = data.view(1, data.size(0), data.size(1), data.size(2))
-            data = Variable(data, volatile=True)
+            data = Variable(data)
             output = model(data)
             pred = output.data.max(1, keepdim=True)[1]
 
