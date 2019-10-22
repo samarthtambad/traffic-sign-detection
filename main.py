@@ -13,7 +13,7 @@ parser.add_argument('--data', type=str, default='data', metavar='D',
                     help="folder where data is located. train_data.zip and test_data.zip need to be found in the folder")
 parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
-parser.add_argument('--epochs', type=int, default=10, metavar='N',
+parser.add_argument('--epochs', type=int, default=510, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 0.01)')
@@ -28,8 +28,8 @@ args = parser.parse_args()
 torch.manual_seed(args.seed)
 
 ### Data Initialization and Loading
-from data import initialize_data, data_transforms # data.py in the same folder
-initialize_data(args.data) # extracts the zip files, makes a validation set
+from data import initialize_data, data_transforms  # data.py in the same folder
+initialize_data(args.data)  # extracts the zip files, makes a validation set
 
 train_loader = torch.utils.data.DataLoader(
     datasets.ImageFolder(args.data + '/train_images',
@@ -39,6 +39,17 @@ val_loader = torch.utils.data.DataLoader(
     datasets.ImageFolder(args.data + '/val_images',
                          transform=data_transforms),
     batch_size=args.batch_size, shuffle=False, num_workers=1)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print('Using device:', device)
+print()
+
+if device.type == 'cuda':
+    print(torch.cuda.get_device_name(0))
+    print('Memory Usage:')
+    print('Allocated:', round(torch.cuda.memory_allocated(0)/1024**3, 1), 'GB')
+    print('Cached:  ', round(torch.cuda.memory_cached(0)/1024**3, 1), 'GB')
+
 
 # Neural Network and Optimizer
 # We define neural net in model.py so that it can be reused by the evaluate.py script
