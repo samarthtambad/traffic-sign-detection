@@ -7,6 +7,8 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
 
+use_cuda = True
+
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch GTSRB example')
 parser.add_argument('--data', type=str, default='data', metavar='D',
@@ -55,6 +57,8 @@ if device.type == 'cuda':
 # We define neural net in model.py so that it can be reused by the evaluate.py script
 from model import Net
 model = Net()
+if use_cuda and torch.cuda.is_available():
+    model.cuda()
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
@@ -63,6 +67,9 @@ def train(epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
+        if use_cuda and torch.cuda.is_available():
+            data = data.cuda()
+            target = target.cuda()
         optimizer.zero_grad()
         output = model(data)
         loss = F.nll_loss(output, target)
@@ -81,6 +88,9 @@ def validation():
     with torch.no_grad():
         for data, target in val_loader:
             data, target = Variable(data), Variable(target)
+            if use_cuda and torch.cuda.is_available():
+                data = data.cuda()
+                target = target.cuda()
             output = model(data)
             validation_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
             pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
