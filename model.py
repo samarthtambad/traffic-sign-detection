@@ -66,7 +66,8 @@ class Net(nn.Module):
     def forward(self, x):
         x = self.stn(x)
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        # x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        x = F.relu(F.max_pool2d(self.conv2(x), 2))  # removed dropout
         x = x.view(-1, 500)
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=True)
