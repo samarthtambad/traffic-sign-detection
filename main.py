@@ -133,7 +133,7 @@ for epoch in range(CURRENT_EPOCH, args.epochs + 1):
     model_file = 'model_sgd_stn.pth'
     if epoch % 20 == 0:
         model_file = 'model_sgd_stn_' + str(epoch) + '.pth'
-    # torch.save(model.state_dict(), model_file)
+    torch.save(model.state_dict(), model_file)  # save model for sharing
     torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
