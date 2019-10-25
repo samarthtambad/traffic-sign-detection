@@ -9,6 +9,7 @@ from torch.autograd import Variable
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import os.path
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch GTSRB example')
@@ -62,10 +63,11 @@ if use_cuda and torch.cuda.is_available():
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
-checkpoint = torch.load(CHECKPOINT_PATH)
-model.load_state_dict(checkpoint['model_state_dict'])
-optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-CURRENT_EPOCH = checkpoint['epoch']
+if os.path.exists(CHECKPOINT_PATH):
+    checkpoint = torch.load(CHECKPOINT_PATH)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    CURRENT_EPOCH = checkpoint['epoch']
 
 training_loss_values = []
 validation_loss_values = []
