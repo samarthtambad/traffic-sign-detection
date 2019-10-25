@@ -27,7 +27,7 @@ torch.manual_seed(args.seed)
 # Global Values
 use_cuda = True
 CHECKPOINT_PATH = 'resumable_model.pth'
-CURRENT_EPOCH = 0
+CURRENT_EPOCH = 1
 
 
 # Data Initialization and Loading
