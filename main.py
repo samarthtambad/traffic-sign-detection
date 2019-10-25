@@ -63,14 +63,16 @@ if use_cuda and torch.cuda.is_available():
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
+training_loss_values = []
+validation_loss_values = []
+
 if os.path.exists(CHECKPOINT_PATH):
     checkpoint = torch.load(CHECKPOINT_PATH)
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     CURRENT_EPOCH = checkpoint['epoch']
-
-training_loss_values = []
-validation_loss_values = []
+    training_loss_values = checkpoint['training_loss']
+    validation_loss_values = checkpoint['validation_loss']
 
 
 def train(epoch):
@@ -94,7 +96,6 @@ def train(epoch):
 
     training_loss_values.append(running_loss / len(train_loader.dataset))
     plot(training_loss_values)
-    return running_loss/len(train_loader.dataset)
 
 
 def plot(values):
@@ -124,12 +125,11 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
-    return validation_loss
 
 
 for epoch in range(CURRENT_EPOCH, args.epochs + 1):
-    tloss = train(epoch)
-    vloss = validation()
+    train(epoch)
+    validation()
     model_file = 'model_sgd_stn.pth'
     if epoch % 20 == 0:
         model_file = 'model_sgd_stn_' + str(epoch) + '.pth'
@@ -138,8 +138,8 @@ for epoch in range(CURRENT_EPOCH, args.epochs + 1):
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'loss': tloss,
-        'validation_loss': vloss
+        'training_loss': training_loss_values,
+        'validation_loss': validation_loss_values
     }, CHECKPOINT_PATH)
     print('\nSaved model to ' + model_file + '. You can run `python evaluate.py --model ' + model_file +
           '` to generate the Kaggle formatted csv file')
