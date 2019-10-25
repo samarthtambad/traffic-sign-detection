@@ -91,7 +91,7 @@ def train(epoch):
     plot(training_loss_values)
 
 
-def plot(values, y_label, save_path):
+def plot(values):
     plt.plot(values)
     plt.xlabel('Epochs')
     plt.ylabel('Training Loss')
