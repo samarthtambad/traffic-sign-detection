@@ -28,9 +28,11 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(3, 100, kernel_size=5)
         self.conv2 = nn.Conv2d(100, 200, kernel_size=5)
+        self.conv3 = nn.Conv2d(200, 500, kernel_size=4)
         self.conv2_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(200 * 5 * 5, 500)
-        self.fc2 = nn.Linear(500, nclasses)
+        self.conv3_drop = nn.Dropout2d()
+        self.fc1 = nn.Linear(500 * 1 * 1, 50)
+        self.fc2 = nn.Linear(50, nclasses)
 
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
@@ -67,7 +69,8 @@ class Net(nn.Module):
         x = self.stn(x)
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = x.view(-1, 200 * 5 * 5)
+        x = F.relu(F.max_pool2d(self.conv3_drop(self.conv3(x)), 2))
+        x = x.view(-1, 500 * 1 * 1)
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=True)
         x = self.fc2(x)
