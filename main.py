@@ -6,6 +6,9 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 use_cuda = True
 
@@ -62,9 +65,12 @@ if use_cuda and torch.cuda.is_available():
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
+training_loss_values = []
+validation_loss_values = []
 
 def train(epoch):
     model.train()
+    running_loss = 0.0
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = Variable(data), Variable(target)
         if use_cuda and torch.cuda.is_available():
@@ -75,10 +81,21 @@ def train(epoch):
         loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
+        running_loss += loss.item() * data.size(0)
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
+
+    training_loss_values.append(running_loss / len(train_loader.dataset))
+    plot(training_loss_values)
+
+
+def plot(values, y_label, save_path):
+    plt.plot(values)
+    plt.xlabel('Epochs')
+    plt.ylabel('Training Loss')
+    plt.savefig('convergence.png')
 
 
 def validation():
@@ -97,6 +114,7 @@ def validation():
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     validation_loss /= len(val_loader.dataset)
+    validation_loss_values.append(validation_loss)
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
@@ -109,4 +127,5 @@ for epoch in range(1, args.epochs + 1):
     if epoch % 20 == 0:
         model_file = 'model_sgd_stn_' + str(epoch) + '.pth'
     torch.save(model.state_dict(), model_file)
-    print('\nSaved model to ' + model_file + '. You can run `python evaluate.py --model' + model_file + '` to generate the Kaggle formatted csv file')
+    print('\nSaved model to ' + model_file + '. You can run `python evaluate.py --model ' + model_file +
+          '` to generate the Kaggle formatted csv file')
