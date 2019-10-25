@@ -10,29 +10,26 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-use_cuda = True
-
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch GTSRB example')
-parser.add_argument('--data', type=str, default='data', metavar='D',
-                    help="folder where data is located. train_data.zip and test_data.zip need to be found in the folder")
-parser.add_argument('--batch-size', type=int, default=64, metavar='N',
-                    help='input batch size for training (default: 64)')
-parser.add_argument('--epochs', type=int, default=510, metavar='N',
-                    help='number of epochs to train (default: 10)')
-parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
-                    help='learning rate (default: 0.01)')
-parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
-                    help='SGD momentum (default: 0.5)')
-parser.add_argument('--seed', type=int, default=1, metavar='S',
-                    help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
-                    help='how many batches to wait before logging training status')
+parser.add_argument('--data', type=str, default='data', metavar='D', help="folder where data is located. train_data.zip and test_data.zip need to be found in the folder")
+parser.add_argument('--batch-size', type=int, default=64, metavar='N', help='input batch size for training (default: 64)')
+parser.add_argument('--epochs', type=int, default=510, metavar='N', help='number of epochs to train (default: 10)')
+parser.add_argument('--lr', type=float, default=0.01, metavar='LR', help='learning rate (default: 0.01)')
+parser.add_argument('--momentum', type=float, default=0.5, metavar='M', help='SGD momentum (default: 0.5)')
+parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
+parser.add_argument('--log-interval', type=int, default=10, metavar='N', help='how many batches to wait before logging training status')
 args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 
-### Data Initialization and Loading
+# Global Values
+use_cuda = True
+CHECKPOINT_PATH = 'resumable_model.pth'
+CURRENT_EPOCH = 0
+
+
+# Data Initialization and Loading
 from data import initialize_data, data_transforms  # data.py in the same folder
 initialize_data(args.data)  # extracts the zip files, makes a validation set
 
@@ -65,8 +62,14 @@ if use_cuda and torch.cuda.is_available():
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
+checkpoint = torch.load(CHECKPOINT_PATH)
+model.load_state_dict(checkpoint['model_state_dict'])
+optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+CURRENT_EPOCH = checkpoint['epoch']
+
 training_loss_values = []
 validation_loss_values = []
+
 
 def train(epoch):
     model.train()
@@ -89,6 +92,7 @@ def train(epoch):
 
     training_loss_values.append(running_loss / len(train_loader.dataset))
     plot(training_loss_values)
+    return running_loss/len(train_loader.dataset)
 
 
 def plot(values):
@@ -118,14 +122,22 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
+    return validation_loss
 
 
-for epoch in range(1, args.epochs + 1):
-    train(epoch)
-    validation()
+for epoch in range(CURRENT_EPOCH, args.epochs + 1):
+    tloss = train(epoch)
+    vloss = validation()
     model_file = 'model_sgd_stn.pth'
     if epoch % 20 == 0:
         model_file = 'model_sgd_stn_' + str(epoch) + '.pth'
-    torch.save(model.state_dict(), model_file)
+    # torch.save(model.state_dict(), model_file)
+    torch.save({
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': tloss,
+        'validation_loss': vloss
+    }, CHECKPOINT_PATH)
     print('\nSaved model to ' + model_file + '. You can run `python evaluate.py --model ' + model_file +
           '` to generate the Kaggle formatted csv file')
