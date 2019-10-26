@@ -95,14 +95,15 @@ def train(epoch):
                 100. * batch_idx / len(train_loader), loss.item()))
 
     training_loss_values.append(running_loss / len(train_loader.dataset))
-    plot(training_loss_values)
 
 
-def plot(values):
-    plt.plot(values)
+def plot():
+    plt.plot(training_loss_values, label='training loss')
+    plt.plot(validation_loss_values, label='validation loss')
+    plt.legend()
     plt.xlabel('Epochs')
-    plt.ylabel('Training Loss')
-    plt.savefig('convergence.png')
+    plt.ylabel('Loss')
+    plt.savefig('convergence_plot.png')
 
 
 def validation():
@@ -130,6 +131,7 @@ def validation():
 for epoch in range(CURRENT_EPOCH, args.epochs + 1):
     train(epoch)
     validation()
+    plot()
     model_file = 'model_adam_stn.pth'
     if epoch % 10 == 0:
         model_file = 'model_adam_stn_' + str(epoch) + '.pth'
