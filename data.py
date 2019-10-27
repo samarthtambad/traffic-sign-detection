@@ -14,6 +14,62 @@ data_transforms = transforms.Compose([
     transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
 ])
 
+# other transformations to images to add to dataset
+# https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
+# https://pytorch.org/docs/stable/torchvision/transforms.html
+
+# translation, scale and rotation variations
+data_resize_crop = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.RandomResizedCrop(32),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+])
+
+data_rotate = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.RandomRotation(30),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+])
+
+data_hvflip = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.RandomHorizontalFlip(1),
+    transforms.RandomVerticalFlip(1),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+])
+
+data_hflip = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.RandomHorizontalFlip(1),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+])
+
+data_vflip = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.RandomVerticalFlip(1),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+])
+
+# color variations
+data_color_jitter = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.ColorJitter(brightness=0, contrast=0, saturation=0, hue=0),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+])
+
+data_grayscale = transforms.Compose([
+    transforms.Resize((32, 32)),
+    transforms.Grayscale(num_output_channels=3),
+    transforms.ToTensor(),
+    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
+])
+
 
 def initialize_data(folder):
     train_zip = folder + '/train_images.zip'

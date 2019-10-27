@@ -7,19 +7,23 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.autograd import Variable
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os.path
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch GTSRB example')
-parser.add_argument('--data', type=str, default='data', metavar='D', help="folder where data is located. train_data.zip and test_data.zip need to be found in the folder")
-parser.add_argument('--batch-size', type=int, default=64, metavar='N', help='input batch size for training (default: 64)')
+parser.add_argument('--data', type=str, default='data', metavar='D',
+                    help="folder where data is located. train_data.zip and test_data.zip need to be found in the folder")
+parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+                    help='input batch size for training (default: 64)')
 parser.add_argument('--epochs', type=int, default=510, metavar='N', help='number of epochs to train (default: 10)')
 parser.add_argument('--lr', type=float, default=0.0001, metavar='LR', help='learning rate (default: 0.01)')
 parser.add_argument('--momentum', type=float, default=0.5, metavar='M', help='SGD momentum (default: 0.5)')
 parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N', help='how many batches to wait before logging training status')
+parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+                    help='how many batches to wait before logging training status')
 args = parser.parse_args()
 
 torch.manual_seed(args.seed)
@@ -29,18 +33,27 @@ use_cuda = True
 CHECKPOINT_PATH = 'resumable_model.pth'
 CURRENT_EPOCH = 1
 
-
 # Data Initialization and Loading
-from data import initialize_data, data_transforms  # data.py in the same folder
+from data import initialize_data, data_transforms, data_resize_crop, \
+    data_rotate, data_hvflip, data_hflip, data_vflip, data_color_jitter, data_grayscale
+
 initialize_data(args.data)  # extracts the zip files, makes a validation set
 
 train_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/train_images',
-                         transform=data_transforms),
+    torch.utils.data.ConcatDataset([
+        datasets.ImageFolder(args.data + '/train_images', transform=data_transforms),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_resize_crop),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_rotate),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_hvflip),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_hflip),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_vflip),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_color_jitter),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_grayscale),
+    ]),
     batch_size=args.batch_size, shuffle=True, num_workers=1)
+
 val_loader = torch.utils.data.DataLoader(
-    datasets.ImageFolder(args.data + '/val_images',
-                         transform=data_transforms),
+    datasets.ImageFolder(args.data + '/val_images', transform=data_transforms),
     batch_size=args.batch_size, shuffle=False, num_workers=1)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -50,13 +63,13 @@ print()
 if device.type == 'cuda':
     print(torch.cuda.get_device_name(0))
     print('Memory Usage:')
-    print('Allocated:', round(torch.cuda.memory_allocated(0)/1024**3, 1), 'GB')
-    print('Cached:  ', round(torch.cuda.memory_cached(0)/1024**3, 1), 'GB')
-
+    print('Allocated:', round(torch.cuda.memory_allocated(0) / 1024 ** 3, 1), 'GB')
+    print('Cached:  ', round(torch.cuda.memory_cached(0) / 1024 ** 3, 1), 'GB')
 
 # Neural Network and Optimizer
 # We define neural net in model.py so that it can be reused by the evaluate.py script
 from model import Net
+
 model = Net()
 if use_cuda and torch.cuda.is_available():
     model.cuda()
@@ -92,7 +105,7 @@ def train(epoch):
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+                       100. * batch_idx / len(train_loader), loss.item()))
 
     training_loss_values.append(running_loss / len(train_loader.dataset))
 
