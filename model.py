@@ -16,8 +16,8 @@ class Net(nn.Module):
         self.conv3 = nn.Conv2d(200, 500, kernel_size=4)
         self.conv2_drop = nn.Dropout2d()
         self.conv3_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(500 * 1 * 1, 50)
-        self.fc2 = nn.Linear(50, nclasses)
+        self.fc1 = nn.Linear(500 * 1 * 1, 150)
+        self.fc2 = nn.Linear(150, nclasses)
 
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
