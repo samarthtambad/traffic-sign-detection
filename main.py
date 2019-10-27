@@ -34,6 +34,7 @@ torch.manual_seed(args.seed)
 use_cuda = True
 CHECKPOINT_PATH = 'resumable_model.pth'
 CURRENT_EPOCH = 1
+first = True
 
 # Data Initialization and Loading
 from data import initialize_data, data_transforms, data_resize_crop, \
@@ -113,12 +114,14 @@ def train(epoch):
 
 
 def plot():
-    plt.plot(training_loss_values, color='blue', label='training loss')
-    plt.plot(validation_loss_values, color='yellow', label='validation loss')
+    fig = plt.figure()
+    plt.plot(training_loss_values, label='training loss')
+    plt.plot(validation_loss_values, label='validation loss')
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.savefig('convergence_plot.png')
+    plt.close(fig)
 
 
 def validation():

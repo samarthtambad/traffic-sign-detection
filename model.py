@@ -13,10 +13,10 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(3, 100, kernel_size=5)
         self.conv2 = nn.Conv2d(100, 200, kernel_size=5)
-        self.conv3 = nn.Conv2d(200, 500, kernel_size=4)
+        self.conv3 = nn.Conv2d(200, 200, kernel_size=2)
         self.conv2_drop = nn.Dropout2d()
         self.conv3_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(500 * 1 * 1, 150)
+        self.fc1 = nn.Linear(200 * 2 * 2, 150)
         self.fc2 = nn.Linear(150, nclasses)
 
         # Spatial transformer localization-network
