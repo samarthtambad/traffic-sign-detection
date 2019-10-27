@@ -146,7 +146,7 @@ for epoch in range(CURRENT_EPOCH, args.epochs + 1):
     validation()
     plot()
     model_file = 'model_adam_stn.pth'
-    if epoch % 10 == 0:
+    if epoch % 2 == 0:
         model_file = 'model_adam_stn_' + str(epoch) + '.pth'
     torch.save(model.state_dict(), model_file)  # save model for sharing
     torch.save({
