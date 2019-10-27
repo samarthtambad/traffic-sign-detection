@@ -14,7 +14,7 @@ data_transforms = transforms.Compose([
     transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
 ])
 
-# other transformations to images to add to dataset
+# other transformations on images to add to dataset
 # https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
 # https://pytorch.org/docs/stable/torchvision/transforms.html
 

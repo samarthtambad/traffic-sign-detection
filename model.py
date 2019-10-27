@@ -4,6 +4,9 @@ import torch.nn.functional as F
 
 nclasses = 43 # GTSRB as 43 classes
 
+# https://pytorch.org/docs/stable/nn.html?highlight=conv2d#torch.nn.Conv2d
+# https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
+
 
 class Net(nn.Module):
     def __init__(self):

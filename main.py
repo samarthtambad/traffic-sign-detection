@@ -28,6 +28,8 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 
+# https://pytorch.org/tutorials/beginner/saving_loading_models.html
+
 # Global Values
 use_cuda = True
 CHECKPOINT_PATH = 'resumable_model.pth'
@@ -111,8 +113,8 @@ def train(epoch):
 
 
 def plot():
-    plt.plot(training_loss_values, label='training loss')
-    plt.plot(validation_loss_values, label='validation loss')
+    plt.plot(training_loss_values, color='blue', label='training loss')
+    plt.plot(validation_loss_values, color='yellow', label='validation loss')
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
