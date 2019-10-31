@@ -11,13 +11,19 @@ nclasses = 43 # GTSRB as 43 classes
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 100, kernel_size=5)
-        self.conv2 = nn.Conv2d(100, 200, kernel_size=5)
-        self.conv3 = nn.Conv2d(200, 250, kernel_size=4)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=5)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=5, stride=2)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3)
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, stride=2)
+        self.conv5 = nn.Conv2d(256, 512, kernel_size=3, stride=2)
+        self.conv1_drop = nn.Dropout2d()
         self.conv2_drop = nn.Dropout2d()
         self.conv3_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(250 * 1 * 1, 100)
-        self.fc2 = nn.Linear(100, nclasses)
+        self.conv4_drop = nn.Dropout2d()
+        self.conv5_drop = nn.Dropout2d()
+        self.fc1 = nn.Linear(512 * 1 * 1, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, nclasses)
 
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
@@ -52,12 +58,16 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = self.stn(x)
-        x = F.leaky_relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.leaky_relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = F.leaky_relu(F.max_pool2d(self.conv3_drop(self.conv3(x)), 2))
-        x = x.view(-1, 250 * 1 * 1)
+        x = F.leaky_relu(self.conv1_drop(self.conv1(x)))
+        x = F.leaky_relu(self.conv2_drop(self.conv2(x)))
+        x = F.leaky_relu(self.conv3_drop(self.conv3(x)))
+        x = F.leaky_relu(self.conv4_drop(self.conv4(x)))
+        x = F.leaky_relu(self.conv5_drop(self.conv5(x)))
+        x = x.view(-1, 512 * 1 * 1)
         x = F.leaky_relu(self.fc1(x))
         x = F.dropout(x, training=True)
-        x = self.fc2(x)
+        x = F.leaky_relu(self.fc2(x))
+        x = F.dropout(x, training=True)
+        x = self.fc3(x)
         return F.log_softmax(x, dim=1)
 
