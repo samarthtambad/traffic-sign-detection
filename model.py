@@ -23,7 +23,9 @@ class Net(nn.Module):
         self.conv5_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(512 * 1 * 1, 256)
         self.fc2 = nn.Linear(256, 128)
-        self.fc3 = nn.Linear(128, nclasses)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 64)
+        self.fc5 = nn.Linear(64, nclasses)
 
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
@@ -68,6 +70,10 @@ class Net(nn.Module):
         x = F.dropout(x, training=True)
         x = F.leaky_relu(self.fc2(x))
         x = F.dropout(x, training=True)
-        x = self.fc3(x)
+        x = F.leaky_relu(self.fc3(x))
+        x = F.dropout(x, training=True)
+        x = F.leaky_relu(self.fc4(x))
+        x = F.dropout(x, training=True)
+        x = self.fc5(x)
         return F.log_softmax(x, dim=1)
 
