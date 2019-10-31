@@ -98,12 +98,14 @@ def train(epoch):
 
 
 def plot():
+    fig = plt.figure()
     plt.plot(training_loss_values, label='training loss')
     plt.plot(validation_loss_values, label='validation loss')
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.savefig('convergence_plot.png')
+    plt.close(fig)
 
 
 def validation():
