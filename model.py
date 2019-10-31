@@ -11,21 +11,20 @@ nclasses = 43 # GTSRB as 43 classes
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 32, kernel_size=5)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=5, stride=2)
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=3)
-        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, stride=2)
-        self.conv5 = nn.Conv2d(256, 512, kernel_size=3, stride=2)
+        self.conv1 = nn.Conv2d(3, 96, kernel_size=3)    # add dropout
+        self.conv2 = nn.Conv2d(96, 96, kernel_size=3)   # add dropout
+        self.conv3 = nn.Conv2d(96, 96, kernel_size=3, stride=2)
+        self.conv4 = nn.Conv2d(96, 192, kernel_size=3)  # add dropout
+        self.conv5 = nn.Conv2d(192, 192, kernel_size=3) # add dropout
+        self.conv6 = nn.Conv2d(192, 192, kernel_size=3, stride=2)
+        self.conv7 = nn.Conv2d(192, 192, kernel_size=3) # add dropout
+        self.conv8 = nn.Conv2d(192, 192, kernel_size=1)
+        self.conv9 = nn.Conv2d(192, nclasses, kernel_size=1)
         self.conv1_drop = nn.Dropout2d()
         self.conv2_drop = nn.Dropout2d()
-        self.conv3_drop = nn.Dropout2d()
         self.conv4_drop = nn.Dropout2d()
         self.conv5_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(512 * 1 * 1, 256)
-        self.fc2 = nn.Linear(256, 128)
-        self.fc3 = nn.Linear(128, 64)
-        self.fc4 = nn.Linear(64, 64)
-        self.fc5 = nn.Linear(64, nclasses)
+        self.conv7_drop = nn.Dropout2d()
 
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
@@ -59,21 +58,17 @@ class Net(nn.Module):
         return x
 
     def forward(self, x):
-        x = self.stn(x)
+        # x = self.stn(x)
         x = F.leaky_relu(self.conv1_drop(self.conv1(x)))
         x = F.leaky_relu(self.conv2_drop(self.conv2(x)))
-        x = F.leaky_relu(self.conv3_drop(self.conv3(x)))
+        x = F.leaky_relu(self.conv3(x))
         x = F.leaky_relu(self.conv4_drop(self.conv4(x)))
         x = F.leaky_relu(self.conv5_drop(self.conv5(x)))
-        x = x.view(-1, 512 * 1 * 1)
-        x = F.leaky_relu(self.fc1(x))
-        x = F.dropout(x, training=True)
-        x = F.leaky_relu(self.fc2(x))
-        x = F.dropout(x, training=True)
-        x = F.leaky_relu(self.fc3(x))
-        x = F.dropout(x, training=True)
-        x = F.leaky_relu(self.fc4(x))
-        x = F.dropout(x, training=True)
-        x = self.fc5(x)
+        x = F.leaky_relu(self.conv6(x))
+        x = F.leaky_relu(self.conv7_drop(self.conv7(x)))
+        x = F.leaky_relu(self.conv8(x))
+        # x = x.view(-1, 512 * 1 * 1)
+        # global averaging over 6 × 6 spatial dimensions
+        x = F.adaptive_avg_pool2d(1)
         return F.log_softmax(x, dim=1)
 

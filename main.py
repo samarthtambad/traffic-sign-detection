@@ -50,7 +50,7 @@ train_loader = torch.utils.data.DataLoader(
         # datasets.ImageFolder(args.data + '/train_images', transform=data_hvflip),
         # datasets.ImageFolder(args.data + '/train_images', transform=data_hflip),
         # datasets.ImageFolder(args.data + '/train_images', transform=data_vflip),
-        # datasets.ImageFolder(args.data + '/train_images', transform=data_color_jitter),
+        datasets.ImageFolder(args.data + '/train_images', transform=data_color_jitter),
         datasets.ImageFolder(args.data + '/train_images', transform=data_grayscale),
     ]),
     batch_size=args.batch_size, shuffle=True, num_workers=1)
