@@ -13,11 +13,11 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(3, 100, kernel_size=5)
         self.conv2 = nn.Conv2d(100, 200, kernel_size=5)
-        self.conv3 = nn.Conv2d(200, 200, kernel_size=2)
+        self.conv3 = nn.Conv2d(200, 250, kernel_size=4)
         self.conv2_drop = nn.Dropout2d()
         self.conv3_drop = nn.Dropout2d()
-        self.fc1 = nn.Linear(200 * 2 * 2, 150)
-        self.fc2 = nn.Linear(150, nclasses)
+        self.fc1 = nn.Linear(250 * 1 * 1, 100)
+        self.fc2 = nn.Linear(100, nclasses)
 
         # Spatial transformer localization-network
         self.localization = nn.Sequential(
@@ -52,11 +52,11 @@ class Net(nn.Module):
 
     def forward(self, x):
         x = self.stn(x)
-        x = F.relu(F.max_pool2d(self.conv1(x), 2))
-        x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
-        x = F.relu(F.max_pool2d(self.conv3_drop(self.conv3(x)), 2))
-        x = x.view(-1, 200 * 2 * 2)
-        x = F.relu(self.fc1(x))
+        x = F.leaky_relu(F.max_pool2d(self.conv1(x), 2))
+        x = F.leaky_relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
+        x = F.leaky_relu(F.max_pool2d(self.conv3_drop(self.conv3(x)), 2))
+        x = x.view(-1, 250 * 1 * 1)
+        x = F.leaky_relu(self.fc1(x))
         x = F.dropout(x, training=True)
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
