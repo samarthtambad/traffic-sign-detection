@@ -11,15 +11,15 @@ nclasses = 43 # GTSRB as 43 classes
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(3, 96, kernel_size=3)    # add dropout
-        self.conv2 = nn.Conv2d(96, 96, kernel_size=3)   # add dropout
-        self.conv3 = nn.Conv2d(96, 96, kernel_size=3, stride=2)
-        self.conv4 = nn.Conv2d(96, 192, kernel_size=3)  # add dropout
-        self.conv5 = nn.Conv2d(192, 192, kernel_size=3) # add dropout
-        self.conv6 = nn.Conv2d(192, 192, kernel_size=3, stride=2)
-        self.conv7 = nn.Conv2d(192, 192, kernel_size=3) # add dropout
-        self.conv8 = nn.Conv2d(192, 192, kernel_size=1)
-        self.conv9 = nn.Conv2d(192, nclasses, kernel_size=1)
+        self.conv1 = nn.Conv2d(3, 128, kernel_size=3)    # add dropout
+        self.conv2 = nn.Conv2d(128, 128, kernel_size=3)   # add dropout
+        self.conv3 = nn.Conv2d(128, 128, kernel_size=3, stride=2)
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=3)  # add dropout
+        self.conv5 = nn.Conv2d(256, 256, kernel_size=3) # add dropout
+        self.conv6 = nn.Conv2d(256, 256, kernel_size=3, stride=2)
+        self.conv7 = nn.Conv2d(256, 256, kernel_size=3) # add dropout
+        self.conv8 = nn.Conv2d(256, 128, kernel_size=1)
+        self.conv9 = nn.Conv2d(128, nclasses, kernel_size=1)
         self.conv1_drop = nn.Dropout2d()
         self.conv2_drop = nn.Dropout2d()
         self.conv4_drop = nn.Dropout2d()
@@ -58,7 +58,7 @@ class Net(nn.Module):
         return x
 
     def forward(self, x):
-        # x = self.stn(x)
+        x = self.stn(x)
         x = F.leaky_relu(self.conv1_drop(self.conv1(x)))
         x = F.leaky_relu(self.conv2_drop(self.conv2(x)))
         x = F.leaky_relu(self.conv3(x))
