@@ -16,6 +16,8 @@ import os.path
 parser = argparse.ArgumentParser(description='PyTorch GTSRB example')
 parser.add_argument('--data', type=str, default='data', metavar='D',
                     help="folder where data is located. train_data.zip and test_data.zip need to be found in the folder")
+parser.add_argument('--output', type=str, default='', metavar='D',
+                    help="folder where output should be stored")
 parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--epochs', type=int, default=510, metavar='N', help='number of epochs to train (default: 10)')
@@ -32,7 +34,7 @@ torch.manual_seed(args.seed)
 
 # Global Values
 use_cuda = True
-CHECKPOINT_PATH = 'resumable_model.pth'
+CHECKPOINT_PATH = args.output + 'resumable_model.pth'
 CURRENT_EPOCH = 1
 first = True
 
@@ -120,7 +122,7 @@ def plot():
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.savefig('convergence_plot.png')
+    plt.savefig(args.output + 'convergence_plot.png')
     plt.close(fig)
 
 
@@ -150,9 +152,9 @@ for epoch in range(CURRENT_EPOCH, args.epochs + 1):
     train(epoch)
     validation()
     plot()
-    model_file = 'model_adam_stn.pth'
+    model_file = args.output + 'model_adam_stn.pth'
     if epoch % 2 == 0:
-        model_file = 'model_adam_stn_' + str(epoch) + '.pth'
+        model_file = args.output + 'model_all_cnn_' + str(epoch) + '.pth'
     torch.save(model.state_dict(), model_file)  # save model for sharing
     torch.save({
         'epoch': epoch,
