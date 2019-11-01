@@ -40,7 +40,7 @@ first = True
 
 # Data Initialization and Loading
 from data import initialize_data, data_transforms, data_resize_crop, \
-    data_rotate, data_hvflip, data_hflip, data_vflip, data_color_jitter, data_grayscale
+    data_rotate, data_color_jitter, data_grayscale
 
 initialize_data(args.data)  # extracts the zip files, makes a validation set
 
@@ -49,9 +49,6 @@ train_loader = torch.utils.data.DataLoader(
         datasets.ImageFolder(args.data + '/train_images', transform=data_transforms),
         datasets.ImageFolder(args.data + '/train_images', transform=data_resize_crop),
         datasets.ImageFolder(args.data + '/train_images', transform=data_rotate),
-        # datasets.ImageFolder(args.data + '/train_images', transform=data_hvflip),
-        # datasets.ImageFolder(args.data + '/train_images', transform=data_hflip),
-        # datasets.ImageFolder(args.data + '/train_images', transform=data_vflip),
         datasets.ImageFolder(args.data + '/train_images', transform=data_color_jitter),
         datasets.ImageFolder(args.data + '/train_images', transform=data_grayscale),
     ]),
@@ -152,7 +149,7 @@ for epoch in range(CURRENT_EPOCH, args.epochs + 1):
     train(epoch)
     validation()
     plot()
-    model_file = args.output + 'model_adam_stn.pth'
+    model_file = args.output + 'model_all_cnn.pth'
     if epoch % 2 == 0:
         model_file = args.output + 'model_all_cnn_' + str(epoch) + '.pth'
     torch.save(model.state_dict(), model_file)  # save model for sharing

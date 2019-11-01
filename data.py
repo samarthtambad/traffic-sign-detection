@@ -33,28 +33,6 @@ data_rotate = transforms.Compose([
     transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
 ])
 
-data_hvflip = transforms.Compose([
-    transforms.Resize((32, 32)),
-    transforms.RandomHorizontalFlip(1),
-    transforms.RandomVerticalFlip(1),
-    transforms.ToTensor(),
-    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
-])
-
-data_hflip = transforms.Compose([
-    transforms.Resize((32, 32)),
-    transforms.RandomHorizontalFlip(1),
-    transforms.ToTensor(),
-    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
-])
-
-data_vflip = transforms.Compose([
-    transforms.Resize((32, 32)),
-    transforms.RandomVerticalFlip(1),
-    transforms.ToTensor(),
-    transforms.Normalize((0.3337, 0.3064, 0.3171), ( 0.2672, 0.2564, 0.2629))
-])
-
 # color variations
 data_color_jitter = transforms.Compose([
     transforms.Resize((32, 32)),

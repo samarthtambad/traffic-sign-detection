@@ -68,8 +68,6 @@ class Net(nn.Module):
         x = F.leaky_relu(self.conv7_drop(self.conv7(x)))
         x = F.leaky_relu(self.conv8(x))
         x = F.leaky_relu(self.conv9(x))
-        # x = x.view(-1, 512 * 1 * 1)
-        # global averaging over 6 × 6 spatial dimensions
         x = F.adaptive_avg_pool2d(x, (1, 1))
         x = x.view(-1, nclasses)
         return F.log_softmax(x, dim=1)
