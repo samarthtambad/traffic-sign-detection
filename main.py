@@ -46,12 +46,12 @@ train_loader = torch.utils.data.DataLoader(
     torch.utils.data.ConcatDataset([
         datasets.ImageFolder(args.data + '/train_images', transform=data_transforms),
         # datasets.ImageFolder(args.data + '/train_images', transform=data_resize_crop),
-        datasets.ImageFolder(args.data + '/train_images', transform=data_rotate),
+        # datasets.ImageFolder(args.data + '/train_images', transform=data_rotate),
         # datasets.ImageFolder(args.data + '/train_images', transform=data_hvflip),
         # datasets.ImageFolder(args.data + '/train_images', transform=data_hflip),
         # datasets.ImageFolder(args.data + '/train_images', transform=data_vflip),
-        datasets.ImageFolder(args.data + '/train_images', transform=data_color_jitter),
-        datasets.ImageFolder(args.data + '/train_images', transform=data_grayscale),
+        # datasets.ImageFolder(args.data + '/train_images', transform=data_color_jitter),
+        # datasets.ImageFolder(args.data + '/train_images', transform=data_grayscale),
     ]),
     batch_size=args.batch_size, shuffle=True, num_workers=1)
 
