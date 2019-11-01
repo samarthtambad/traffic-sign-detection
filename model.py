@@ -71,6 +71,6 @@ class Net(nn.Module):
         # x = x.view(-1, 512 * 1 * 1)
         # global averaging over 6 × 6 spatial dimensions
         x = F.adaptive_avg_pool2d(x, (1, 1))
-        x = x.view(64, 43)
+        x = x.view(-1, nclasses)
         return F.log_softmax(x, dim=1)
 
